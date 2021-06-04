@@ -37,9 +37,10 @@ public class PowerUpButton : MonoBehaviour
             powerUpController.EarthPowerUp();
         }
         powerUpController.RemovePowerUp(this.gameObject);*/
-
-        powerUpController.UsePowerUp(powerUpName);
-        powerUpController.RemovePowerUp(this.gameObject);
-
+        if (!powerUpController.powerActive)
+        {
+            powerUpController.UsePowerUp(powerUpName);
+            powerUpController.RemovePowerUp(this.gameObject);
+        }
     }
 }

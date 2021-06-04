@@ -14,7 +14,7 @@ public class PowerUps
 public class PowerUpController : MonoBehaviour
 {
     public static int rightAnswerCount = 0;
-    public bool leafImmunity = false, timeFreeze = false;
+    public bool leafImmunity = false, timeFreeze = false, powerActive = false;
     public int fireComboNumber = 3, airRemovedAnswers = 2;
     public GameObject powerUpButtonPrefab;
     public Transform powerUpWrapper;
@@ -220,6 +220,7 @@ public class PowerUpController : MonoBehaviour
             }
         }
 
+        powerActive = true;
         bg.color = pw.color;
 
         if (pw.name == "Water")

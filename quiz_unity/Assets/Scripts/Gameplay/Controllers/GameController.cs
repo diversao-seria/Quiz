@@ -106,6 +106,7 @@ public class GameController : MonoBehaviour
 	void ShowQuestion()
 	{
 		RemoveAnswerButtons();
+		powerUpController.powerActive = false;
 
 		Question question = questionPool[questionIndex];                                     // Get the QuestionData for the current question																								 // Update questionText with the correct tex
 		questionText.text = question.Text;
