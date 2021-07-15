@@ -12,7 +12,7 @@ public class EventManager : MonoBehaviour
     private bool wasTouched;
 
     // Boolean that represents if it's possible to select an answerButton
-    private bool idleState;
+    public bool idleState;
 
     private List<GameObject> answerButtonList;
 

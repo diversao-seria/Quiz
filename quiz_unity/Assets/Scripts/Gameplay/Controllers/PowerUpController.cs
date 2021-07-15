@@ -73,7 +73,6 @@ public class PowerUpController : MonoBehaviour
         {
             if (leafImmunity)
             {
-                leafImmunity = false;
                 bg.color = grey;
             }
             else
@@ -81,6 +80,10 @@ public class PowerUpController : MonoBehaviour
                 rightAnswerCount = 0;
                 bg.color = grey;
             }
+        }
+        if (leafImmunity)
+        {
+            bg.color = grey;
         }
         if (timeFreeze)
         {

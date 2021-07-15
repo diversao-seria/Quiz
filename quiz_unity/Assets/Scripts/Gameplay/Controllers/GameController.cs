@@ -35,6 +35,7 @@ public class GameController : MonoBehaviour
 	private bool isRoundActive = false;
 	private bool isQuestionAnswered = false;
 
+	private int disabledAlternative = 0;
 	private List<string> sequencia_atuacao = new List<string>();
 	private string source = "Q-0-1-H-0-0-0-AE-0-T-0-S-0";
 	private int h1 = 0, h2 = 0, h3 = 0;
@@ -43,6 +44,7 @@ public class GameController : MonoBehaviour
 	private int questionIndex;
 	private List<GameObject> answerButtonGameObjects = new List<GameObject>();
 	private int streak = 0;
+	private GameObject[] answers;
 
 	private QuestionClock questionClock;
 	private QuizClock quizClock;
@@ -154,7 +156,10 @@ public class GameController : MonoBehaviour
 
 	public void AnswerButtonClicked(bool isCorrect, int alternativeNumber)
 	{
-		isQuestionAnswered = true;
+		if (powerUpController.leafImmunity == false)
+        {
+			isQuestionAnswered = true;
+        }
 
 
 		dataController.GetQuestionAnswers().RegisterPlayerAnswer(
@@ -167,6 +172,7 @@ public class GameController : MonoBehaviour
 			);
 
 		powerUpController.AnswerCount(isCorrect);
+		answers = GameObject.FindGameObjectsWithTag("Answer");
 
 		if (isCorrect)
 		{
@@ -219,7 +225,7 @@ public class GameController : MonoBehaviour
 
 		sequencia_atuacao.Add(string.Join("", parts));										// This puts every part of the separated source string together, creating a new string which will be saved in the .json file.
 
-		StartCoroutine(VisualFeedback(isCorrect));
+		StartCoroutine(VisualFeedback(isCorrect, alternativeNumber));
 	}
 
 	private void UpdateTimeRemainingDisplay(QuestionClock clock)
@@ -265,12 +271,13 @@ public class GameController : MonoBehaviour
 		SceneManager.LoadScene("MenuScreen");
 	}
 
-	IEnumerator VisualFeedback(bool isCorrect)
+	IEnumerator VisualFeedback(bool isCorrect, int alternativeNumber)
 	{
 		if (isCorrect)
 		{
 			feedbackImage.GetComponent<Image>().sprite = correctAnswerIcon;
 			rightAnswers++;
+			powerUpController.leafImmunity = false;
 		}
 		else
 		{
@@ -282,22 +289,37 @@ public class GameController : MonoBehaviour
 		yield return new WaitForSeconds(3);
 		feedbackImage.gameObject.SetActive(false);
 
-		if (questionPool.Count > questionIndex + 1)                                         // If there are more questions, show the next question
-		{
-			questionIndex++;
-			questionNumberTextController.GetComponent<QuestionNumberController>().NextQuestion();
-			// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
-			questionClock.NewCountdown(30);
-			ShowQuestion();
+		if (powerUpController.leafImmunity == false)
+        {
+			if (questionPool.Count > questionIndex + 1)                                         // If there are more questions, show the next question
+			{
+				questionIndex++;
+				questionNumberTextController.GetComponent<QuestionNumberController>().NextQuestion();
+				// questionClock.NewCountdown(dataController.GetComponent<DataController>().RetrieveQuiz().GetQuestionData().QuestionTime);
+				questionClock.NewCountdown(30);
+				ShowQuestion();
 
-			ShowQuestionNumber();
-			isQuestionAnswered = false;
-			eventManager.questionDone();
-		}
-		else                                                                                // If there are no more questions, the round ends
-		{
-			EndRound();
-		}
+				ShowQuestionNumber();
+				isQuestionAnswered = false;
+				eventManager.questionDone();
 
+				answers[disabledAlternative].GetComponent<Image>().enabled = true;
+				answers[disabledAlternative].GetComponent<Button>().enabled = true;
+				answers[disabledAlternative].transform.GetChild(0).gameObject.SetActive(true);
+			}
+			else                                                                             // If there are no more questions, the round ends
+			{
+				EndRound();
+			}
+		}
+        else
+        {
+			eventManager.idleState = true;
+			answers[alternativeNumber].GetComponent<Image>().enabled = false;
+			answers[alternativeNumber].GetComponent<Button>().enabled = false;
+			answers[alternativeNumber].transform.GetChild(0).gameObject.SetActive(false);
+            disabledAlternative = alternativeNumber;
+			powerUpController.leafImmunity = false;
+		}
 	}
 }
